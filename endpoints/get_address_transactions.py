@@ -38,17 +38,17 @@ class PreviousOutpointLookupMode(str, Enum):
     full = "full"
 
 
-@app.get("/addresses/{kaspaAddress}/transactions",
+@app.get("/addresses/{gorAddress}/transactions",
          response_model=TransactionForAddressResponse,
          response_model_exclude_unset=True,
-         tags=["Kaspa addresses"],
+         tags=["Gor addresses"],
          deprecated=True)
 @sql_db_only
 async def get_transactions_for_address(
-        kaspaAddress: str = Path(
-            description="Kaspa address as string e.g. "
-                        "kaspa:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
-            regex="^kaspa\:[a-z0-9]{61,63}$")):
+        gorAddress: str = Path(
+            description="Gor address as string e.g. "
+                        "gor:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
+            regex="^gor\:[a-z0-9]{61,63}$")):
     """
     Get all transactions for a given address from database
     """
@@ -56,7 +56,7 @@ async def get_transactions_for_address(
     #
     # LEFT JOIN transactions_inputs ON transactions_inputs.previous_outpoint_hash = transactions_outputs.transaction_id AND transactions_inputs.previous_outpoint_index::int = transactions_outputs.index
     #
-    # WHERE "script_public_key_address" = 'kaspa:qp7d7rzrj34s2k3qlxmguuerfh2qmjafc399lj6606fc7s69l84h7mrj49hu6'
+    # WHERE "script_public_key_address" = 'gor:qp7d7rzrj34s2k3qlxmguuerfh2qmjafc399lj6606fc7s69l84h7mrj49hu6'
     #
     # ORDER by transactions_outputs.transaction_id
     async with async_session() as session:
@@ -67,10 +67,10 @@ async def get_transactions_for_address(
             FROM transactions
 			LEFT JOIN transactions_outputs ON transactions.transaction_id = transactions_outputs.transaction_id
 			LEFT JOIN transactions_inputs ON transactions_inputs.previous_outpoint_hash = transactions.transaction_id AND transactions_inputs.previous_outpoint_index = transactions_outputs.index
-            WHERE "script_public_key_address" = :kaspaAddress
+            WHERE "script_public_key_address" = :gorAddress
 			ORDER by transactions.block_time DESC
 			LIMIT 500"""),
-                                     {'kaspaAddress': kaspaAddress})
+                                     {'gorAddress': gorAddress})
 
         resp = resp.all()
 
@@ -84,16 +84,16 @@ async def get_transactions_for_address(
     }
 
 
-@app.get("/addresses/{kaspaAddress}/full-transactions",
+@app.get("/addresses/{gorAddress}/full-transactions",
          response_model=List[TxModel],
          response_model_exclude_unset=True,
-         tags=["Kaspa addresses"])
+         tags=["Gor addresses"])
 @sql_db_only
 async def get_full_transactions_for_address(
-        kaspaAddress: str = Path(
-            description="Kaspa address as string e.g. "
-                        "kaspa:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
-            regex="^kaspa\:[a-z0-9]{61,63}$"),
+        gorAddress: str = Path(
+            description="Gor address as string e.g. "
+                        "gor:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
+            regex="^gor\:[a-z0-9]{61,63}$"),
         limit: int = Query(
             description="The number of records to get",
             ge=1,
@@ -116,7 +116,7 @@ async def get_full_transactions_for_address(
         # Doing it this way as opposed to adding it directly in the IN clause
         # so I can re-use the same result in tx_list, TxInput and TxOutput
         tx_within_limit_offset = await s.execute(select(TxAddrMapping.transaction_id)
-                                                 .filter(TxAddrMapping.address == kaspaAddress)
+                                                 .filter(TxAddrMapping.address == gorAddress)
                                                  .limit(limit)
                                                  .offset(offset)
                                                  .order_by(TxAddrMapping.block_time.desc())
@@ -129,22 +129,22 @@ async def get_full_transactions_for_address(
                                          resolve_previous_outpoints)
 
 
-@app.get("/addresses/{kaspaAddress}/transactions-count",
+@app.get("/addresses/{gorAddress}/transactions-count",
          response_model=TransactionCount,
-         tags=["Kaspa addresses"])
+         tags=["Gor addresses"])
 @sql_db_only
 async def get_transaction_count_for_address(
-        kaspaAddress: str = Path(
-            description="Kaspa address as string e.g. "
-                        "kaspa:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
-            regex="^kaspa\:[a-z0-9]{61,63}$")
+        gorAddress: str = Path(
+            description="Gor address as string e.g. "
+                        "gor:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
+            regex="^gor\:[a-z0-9]{61,63}$")
 ):
     """
     Count the number of transactions associated with this address
     """
 
     async with async_session() as s:
-        count_query = select(func.count()).filter(TxAddrMapping.address == kaspaAddress)
+        count_query = select(func.count()).filter(TxAddrMapping.address == gorAddress)
 
         tx_count = await s.execute(count_query)
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 PUSH=$1
-DOCKER_REPO=supertypo/kaspa-rest-server
+DOCKER_REPO=supertypo/gor-rest-server
 
 set -e
 

@@ -50,7 +50,7 @@ class SubmitTransactionResponse(BaseModel):
 
 
 @app.post("/transactions",
-          tags=["Kaspa transactions"],
+          tags=["Gor transactions"],
           response_model_exclude_unset=True,
           responses={200: {"model": SubmitTransactionResponse},
                        400: {"model": SubmitTransactionResponse}})

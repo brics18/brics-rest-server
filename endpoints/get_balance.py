@@ -7,21 +7,21 @@ from server import app, kaspad_client
 
 
 class BalanceResponse(BaseModel):
-    address: str = "kaspa:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00"
+    address: str = "gor:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00"
     balance: int = 38240000000
 
 
-@app.get("/addresses/{kaspaAddress}/balance", response_model=BalanceResponse, tags=["Kaspa addresses"])
+@app.get("/addresses/{gorAddress}/balance", response_model=BalanceResponse, tags=["Gor addresses"])
 async def get_balance_from_kaspa_address(
-        kaspaAddress: str = Path(
-            description="Kaspa address as string e.g. kaspa:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
-            regex="^kaspa\:[a-z0-9]{61,63}$")):
+        gorAddress: str = Path(
+            description="Gor address as string e.g. gor:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
+            regex="^gor\:[a-z0-9]{61,63}$")):
     """
-    Get balance for a given kaspa address
+    Get balance for a given gor address
     """
     resp = await kaspad_client.request("getBalanceByAddressRequest",
                                        params={
-                                           "address": kaspaAddress
+                                           "address": gorAddress
                                        })
 
     try:
@@ -40,6 +40,6 @@ async def get_balance_from_kaspa_address(
         balance = 0
 
     return {
-        "address": kaspaAddress,
+        "address": gorAddress,
         "balance": balance
     }
