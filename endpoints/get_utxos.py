@@ -24,24 +24,24 @@ class UtxoModel(BaseModel):
 
 
 class UtxoResponse(BaseModel):
-    address: str = "gor:qrzk988gtanp3nf76xkpexwud5cxfmfygqf42hz38pwea74s6qrj75jee85nj"
+    address: str = "brics:qqehcree82854tlnqapnn359yj9p9rchq78z5jaq5va85juaj0phg7k502mmg"
     outpoint: OutpointModel
     utxoEntry: UtxoModel
 
 
-@app.get("/addresses/{gorAddress}/utxos", response_model=List[UtxoResponse], tags=["Gor addresses"])
-async def get_utxos_for_address(gorAddress: str = Path(
-    description="Gor address as string e.g. gor:qqkqkzjvr7zwxxmjxjkmxxdwju9kjs6e9u82uh59z07vgaks6gg62v8707g73",
-    regex="^gor\:[a-z0-9]{61,63}$")):
+@app.get("/addresses/{bricsAddress}/utxos", response_model=List[UtxoResponse], tags=["Brics addresses"])
+async def get_utxos_for_address(bricsAddress: str = Path(
+    description="Brics address as string e.g. brics:qqehcree82854tlnqapnn359yj9p9rchq78z5jaq5va85juaj0phg7k502mmg",
+    regex="^brics\:[a-z0-9]{61,63}$")):
     """
-    Lists all open utxo for a given gor address
+    Lists all open utxo for a given brics address
     """
     resp = await kaspad_client.request("getUtxosByAddressesRequest",
                                        params={
-                                           "addresses": [gorAddress]
+                                           "addresses": [bricsAddress]
                                        }, timeout=120)
     try:
-        return (utxo for utxo in resp["getUtxosByAddressesResponse"]["entries"] if utxo["address"] == gorAddress)
+        return (utxo for utxo in resp["getUtxosByAddressesResponse"]["entries"] if utxo["address"] == bricsAddress)
     except KeyError:
         if "getUtxosByAddressesResponse" in resp and "error" in resp["getUtxosByAddressesResponse"]:
             raise HTTPException(status_code=400, detail=resp["getUtxosByAddressesResponse"]["error"])

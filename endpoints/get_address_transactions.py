@@ -38,17 +38,17 @@ class PreviousOutpointLookupMode(str, Enum):
     full = "full"
 
 
-@app.get("/addresses/{gorAddress}/transactions",
+@app.get("/addresses/{bricsAddress}/transactions",
          response_model=TransactionForAddressResponse,
          response_model_exclude_unset=True,
-         tags=["Gor addresses"],
+         tags=["Brics addresses"],
          deprecated=True)
 @sql_db_only
 async def get_transactions_for_address(
-        gorAddress: str = Path(
-            description="Gor address as string e.g. "
-                        "gor:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
-            regex="^gor\:[a-z0-9]{61,63}$")):
+        bricsAddress: str = Path(
+            description="Brics address as string e.g. "
+                        "brics:qqehcree82854tlnqapnn359yj9p9rchq78z5jaq5va85juaj0phg7k502mmg",
+            regex="^brics\:[a-z0-9]{61,63}$")):
     """
     Get all transactions for a given address from database
     """
@@ -56,7 +56,7 @@ async def get_transactions_for_address(
     #
     # LEFT JOIN transactions_inputs ON transactions_inputs.previous_outpoint_hash = transactions_outputs.transaction_id AND transactions_inputs.previous_outpoint_index::int = transactions_outputs.index
     #
-    # WHERE "script_public_key_address" = 'gor:qp7d7rzrj34s2k3qlxmguuerfh2qmjafc399lj6606fc7s69l84h7mrj49hu6'
+    # WHERE "script_public_key_address" = 'brics:qqehcree82854tlnqapnn359yj9p9rchq78z5jaq5va85juaj0phg7k502mmg'
     #
     # ORDER by transactions_outputs.transaction_id
     async with async_session() as session:
@@ -67,10 +67,10 @@ async def get_transactions_for_address(
             FROM transactions
 			LEFT JOIN transactions_outputs ON transactions.transaction_id = transactions_outputs.transaction_id
 			LEFT JOIN transactions_inputs ON transactions_inputs.previous_outpoint_hash = transactions.transaction_id AND transactions_inputs.previous_outpoint_index = transactions_outputs.index
-            WHERE "script_public_key_address" = :gorAddress
+            WHERE "script_public_key_address" = :bricsAddress
 			ORDER by transactions.block_time DESC
 			LIMIT 500"""),
-                                     {'gorAddress': gorAddress})
+                                     {'bricsAddress': bricsAddress})
 
         resp = resp.all()
 
@@ -84,16 +84,16 @@ async def get_transactions_for_address(
     }
 
 
-@app.get("/addresses/{gorAddress}/full-transactions",
+@app.get("/addresses/{bricsAddress}/full-transactions",
          response_model=List[TxModel],
          response_model_exclude_unset=True,
-         tags=["Gor addresses"])
+         tags=["Brics addresses"])
 @sql_db_only
 async def get_full_transactions_for_address(
-        gorAddress: str = Path(
-            description="Gor address as string e.g. "
-                        "gor:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
-            regex="^gor\:[a-z0-9]{61,63}$"),
+        bricsAddress: str = Path(
+            description="Brics address as string e.g. "
+                        "brics:qqehcree82854tlnqapnn359yj9p9rchq78z5jaq5va85juaj0phg7k502mmg",
+            regex="^brics\:[a-z0-9]{61,63}$"),
         limit: int = Query(
             description="The number of records to get",
             ge=1,
@@ -116,7 +116,7 @@ async def get_full_transactions_for_address(
         # Doing it this way as opposed to adding it directly in the IN clause
         # so I can re-use the same result in tx_list, TxInput and TxOutput
         tx_within_limit_offset = await s.execute(select(TxAddrMapping.transaction_id)
-                                                 .filter(TxAddrMapping.address == gorAddress)
+                                                 .filter(TxAddrMapping.address == bricsAddress)
                                                  .limit(limit)
                                                  .offset(offset)
                                                  .order_by(TxAddrMapping.block_time.desc())
@@ -129,22 +129,22 @@ async def get_full_transactions_for_address(
                                          resolve_previous_outpoints)
 
 
-@app.get("/addresses/{gorAddress}/transactions-count",
+@app.get("/addresses/{bricsAddress}/transactions-count",
          response_model=TransactionCount,
-         tags=["Gor addresses"])
+         tags=["Brics addresses"])
 @sql_db_only
 async def get_transaction_count_for_address(
-        gorAddress: str = Path(
-            description="Gor address as string e.g. "
-                        "gor:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00",
-            regex="^gor\:[a-z0-9]{61,63}$")
+        bricsAddress: str = Path(
+            description="Brics address as string e.g. "
+                        "brics:qqehcree82854tlnqapnn359yj9p9rchq78z5jaq5va85juaj0phg7k502mmg",
+            regex="^brics\:[a-z0-9]{61,63}$")
 ):
     """
     Count the number of transactions associated with this address
     """
 
     async with async_session() as s:
-        count_query = select(func.count()).filter(TxAddrMapping.address == gorAddress)
+        count_query = select(func.count()).filter(TxAddrMapping.address == bricsAddress)
 
         tx_count = await s.execute(count_query)
 

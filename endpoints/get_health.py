@@ -24,10 +24,10 @@ class HealthResponse(BaseModel):
     kaspadServers: List[KaspadResponse]
 
 
-@app.get("/info/health", response_model=HealthResponse, tags=["Gor network info"])
+@app.get("/info/health", response_model=HealthResponse, tags=["Brics network info"])
 async def health_state():
     """
-    Returns the current hashrate for Gor network in TH/s.
+    Returns the current hashrate for Brics network in TH/s.
     """
     await kaspad_client.initialize_all()
 

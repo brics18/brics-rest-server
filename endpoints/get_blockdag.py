@@ -7,7 +7,7 @@ from server import app, kaspad_client
 
 
 class BlockdagResponse(BaseModel):
-    networkName: str = "gor-mainnet"
+    networkName: str = "brics-mainnet"
     blockCount: str = "260890"
     headerCount: str = "2131312"
     tipHashes: List[str] = ["78273854a739e3e379dfd34a262bbe922400d8e360e30e3f31228519a334350a"]
@@ -18,10 +18,10 @@ class BlockdagResponse(BaseModel):
     virtualDaaScore: str = "19989141"
 
 
-@app.get("/info/blockdag", response_model=BlockdagResponse, tags=["Gor network info"])
+@app.get("/info/blockdag", response_model=BlockdagResponse, tags=["Brics network info"])
 async def get_blockdag():
     """
-    Get some global Gor BlockDAG information
+    Get some global Brics BlockDAG information
     """
     resp = await kaspad_client.request("getBlockDagInfoRequest")
     return resp["getBlockDagInfoResponse"]

@@ -17,8 +17,8 @@ from kaspad.KaspadMultiClient import KaspadMultiClient
 fastapi.logger.logger.setLevel(logging.WARNING)
 
 app = FastAPI(
-    title="Gor REST-API server",
-    description="This server is to communicate with kaspa network via REST-API",
+    title="Brics REST-API server",
+    description="This server is to communicate with BRICS network via REST-API",
     version=os.getenv("VERSION", "tbd"),
     contact={
         "name": "lAmeR1"
@@ -65,7 +65,7 @@ async def ping_server():
             "is_synced": info["getInfoResponse"]["isSynced"]
         }
     except Exception as exc:
-        raise HTTPException(status_code=500, detail="Kaspad not connected.")
+        raise HTTPException(status_code=500, detail="bricsd not connected.")
 
 
 kaspad_hosts = []

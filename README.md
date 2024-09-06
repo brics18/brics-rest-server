@@ -1,1 +1,1 @@
-# gor-rest-server
+# brics-rest-server
